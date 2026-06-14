@@ -1,39 +1,55 @@
-
 /**
- * VIOLACIÓN AL PRINCIPIO DE SEGREGACIÓN DE INTERFAZ (ISP)
- * 
- * El catálogo de fauna define una interfaz "gorda" que obliga a las aves 
- * a implementar métodos que no les corresponden según su naturaleza.
+ * PRINCIPIO DE SEGREGACIÓN DE INTERFACES (ISP) - SOLUCIÓN
+ * Se fragmenta la interfaz única y masiva en contratos de responsabilidad atómica.
+ * Así, las clases solo implementan los comportamientos que realmente necesitan,
+ * eliminando métodos vacíos y excepciones forzadas en tiempo de ejecución.
  */
 
-interface Bird {
+// 1. Interfaces Segregadas por Capacidades Únicas
+export interface IEater {
     eat(): void;
+}
+
+export interface IFlyer {
     fly(): void;
+}
+
+export interface ISwimmer {
     swim(): void;
 }
 
-export class Toucan implements Bird {
-    public eat() { console.log('El Tucán está comiendo frutas.'); }
-    public fly() { console.log('El Tucán vuela sobre la selva.'); }
-    public swim() { console.log('El Tucán no suele nadar, pero implemento el método vacío.'); }
+// 2. Implementaciones Coherentes y Desacopladas
+
+export class Toucan implements IEater, IFlyer {
+    public eat(): void { 
+        console.log('El Tucán está comiendo frutas.'); 
+    }
+
+    public fly(): void { 
+        console.log('El Tucán vuela sobre la selva.'); 
+    }
 }
 
-export class Hummingbird implements Bird {
-    public eat() { console.log('El Colibrí busca néctar.'); }
-    public fly() { console.log('El Colibrí aletea rápidamente.'); }
-    public swim() { throw new Error('Un colibrí no puede nadar'); }
+export class Hummingbird implements IEater, IFlyer {
+    public eat(): void { 
+        console.log('El Colibrí busca néctar.'); 
+    }
+
+    public fly(): void { 
+        console.log('El Colibrí aletea rápidamente.'); 
+    }
 }
 
 /**
- * VIOLACIÓN FLAGRANTE: El Avestruz es un ave, pero NO VUELA.
- * La interfaz Bird le obliga a implementar fly(), causando una excepción en tiempo de ejecución
- * o un comportamiento inesperado.
+ * El Avestruz ahora cumple perfectamente con el catálogo de fauna sin ser 
+ * forzado a volar, eliminando por completo fugas de acoplamiento.
  */
-export class Ostrich implements Bird {
-    public eat() { console.log('El Avestruz come hierbas.'); }
-    public fly() { 
-        // ¡Error! Violación de ISP.
-        throw new Error('Las avestruces NO vuelan.'); 
+export class Ostrich implements IEater, ISwimmer {
+    public eat(): void { 
+        console.log('El Avestruz come hierbas.'); 
     }
-    public swim() { console.log('El Avestruz puede nadar si es necesario.'); }
+
+    public swim(): void { 
+        console.log('El Avestruz puede nadar si es necesario.'); 
+    }
 }
