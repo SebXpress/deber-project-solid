@@ -1,45 +1,58 @@
-
 /**
- * VIOLACIÓN AL PRINCIPIO DE SUSTITUCIÓN DE LISKOV (LSP)
- * 
- * En la flota de la reserva, intentamos manejar diversos vehículos.
- * Sin embargo, el cliente se ve obligado a conocer los detalles internos
- * de cada marca para poder operar, rompiendo la transparencia de la abstracción.
+ * PRINCIPIO DE SUSTITUCIÓN DE LISKOV (LSP) - SOLUCIÓN
+ * Se define una clase abstracta común. Cualquier subclase (Tesla, Audi, etc.) 
+ * puede sustituir a la clase base 'Vehicle' de forma transparente sin que el 
+ * cliente ('VehicleManager') requiera conocer su tipo exacto en tiempo de ejecución.
  */
 
-export class Tesla { constructor(public model: string) {} }
-export class Audi  { constructor(public model: string) {} }
-export class Toyota{ constructor(public model: string) {} }
-export class Honda { constructor(public model: string) {} }
-export class Ford  { constructor(public model: string) {} }
+// 1. Clase base abstracta (El Contrato Común)
+export abstract class Vehicle {
+    constructor(public readonly model: string) {}
 
+    // Cada vehículo será responsable de proveer sus propios detalles específicos
+    public abstract getCustomFeatures(): string;
+}
+
+// 2. Implementaciones limpias que heredan de Vehicle
+export class Tesla extends Vehicle {
+    public getCustomFeatures(): string {
+        return 'Carga eléctrica al 100%';
+    }
+}
+
+export class Audi extends Vehicle {
+    public getCustomFeatures(): string {
+        return 'Tracción Quattro activada';
+    }
+}
+
+export class Toyota extends Vehicle {
+    public getCustomFeatures(): string {
+        return 'Motor híbrido listo';
+    }
+}
+
+export class Honda extends Vehicle {
+    public getCustomFeatures(): string {
+        return 'VTEC activado';
+    }
+}
+
+export class Ford extends Vehicle {
+    public getCustomFeatures(): string {
+        return 'Built Tough';
+    }
+}
+
+// 3. El Manager ahora CUMPLE LSP. Trabaja de forma agnóstica con cualquier Vehicle.
 export class VehicleManager {
 
-    /**
-     * VIOLACIÓN: Este método rompe LSP y OCP. 
-     * Si agregamos una nueva marca (ej. Volvo), debemos venir aquí a agregar otro 'if' o 'case'.
-     * Además, no podemos tratar a todos los vehículos por igual.
-     */
-    static printVehicleDetails( vehicles: (Tesla | Audi | Toyota | Honda | Ford)[] ) {
-        
-        vehicles.forEach( vehicle => {
-
-            if( vehicle instanceof Tesla ) {
-                console.log('Tesla Model:', vehicle.model, 'Carga eléctrica al 100%');
-            }
-            if( vehicle instanceof Audi ) {
-                console.log('Audi Model:', vehicle.model, 'Tracción Quattro activada');
-            }
-            if( vehicle instanceof Toyota ) {
-                console.log('Toyota Model:', vehicle.model, 'Motor híbrido listo');
-            }
-            if( vehicle instanceof Honda ) {
-                console.log('Honda Model:', vehicle.model, 'VTEC activado');
-            }
-            if( vehicle instanceof Ford ) {
-                console.log('Ford Model:', vehicle.model, 'Built Tough');
-            }
-
+    // Ahora acepta un arreglo estricto de la clase base abstracta
+    public static printVehicleDetails(vehicles: Vehicle[]): void {
+        vehicles.forEach(vehicle => {
+            // Obtenemos dinámicamente el nombre de la clase/marca y sus detalles polimórficamente
+            const brandName = vehicle.constructor.name;
+            console.log(`${brandName} Model: ${vehicle.model} - ${vehicle.getCustomFeatures()}`);
         });
     }
 
